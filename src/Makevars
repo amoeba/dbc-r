@@ -12,7 +12,7 @@ all: $(SHLIB)
 
 $(SHLIB): $(GOARCHIVE)
 
-$(GOARCHIVE): $(GODIR)/dbc_install.go $(GODIR)/dbc_search.go $(GODIR)/go.mod
+$(GOARCHIVE): $(GODIR)/dbc_install.go $(GODIR)/dbc_search.go $(GODIR)/dbc_uninstall.go $(GODIR)/dbc_list.go $(GODIR)/dbc_info.go $(GODIR)/util.go $(GODIR)/go.mod
 	cd $(GODIR) && $(GO) build $(GOFLAGS) -o ../$(GOARCHIVE) .
 
 clean:

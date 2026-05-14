@@ -6,19 +6,17 @@ package main
 import "C"
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/columnar-tech/dbc"
 	"github.com/columnar-tech/dbc/config"
 )
 
-// dbc_install installs the named driver at the user config level.
-// Returns NULL on success or a heap-allocated error string that the caller
-// must free with free().
+// dbc_uninstall removes the named driver from the user config.
+// Returns NULL on success or a heap-allocated error string the caller must free().
 //
-//export dbc_install
-func dbc_install(driverName *C.char) *C.char {
+//export dbc_uninstall
+func dbc_uninstall(driverName *C.char) *C.char {
 	name := C.GoString(driverName)
 
 	client, err := dbc.NewClient()
@@ -27,13 +25,9 @@ func dbc_install(driverName *C.char) *C.char {
 	}
 
 	cfg := config.Get()[config.ConfigUser]
-
-	_, err = client.Install(context.Background(), cfg, name)
-	if err != nil {
+	if err := client.Uninstall(cfg, name); err != nil {
 		return C.CString(fmt.Sprintf("%s", err))
 	}
 
 	return nilCString()
 }
-
-func main() {}
