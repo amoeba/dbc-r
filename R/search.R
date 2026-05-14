@@ -7,7 +7,7 @@
 #'   returns all drivers.
 #' @return A character vector of driver names.
 #' @export
-search <- function(pattern = "") {
+dbc_search <- function(pattern = "") {
   stopifnot(is.character(pattern), length(pattern) == 1L)
   .Call(C_dbc_search, pattern)
 }

@@ -17,6 +17,6 @@ load_driver <- function(name) {
   }
 
   message("Driver '", name, "' not found, installing via dbc...")
-  install(name)
+  dbc_install(name)
   adbcdrivermanager::adbc_driver(name)
 }

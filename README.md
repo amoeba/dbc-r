@@ -14,8 +14,8 @@ remotes::install_github("columnar-tech/dbc-r")
 ### Install a driver
 
 ```r
-dbc::install("sqlite")
-dbc::install("snowflake")
+dbc::dbc_install("sqlite")
+dbc::dbc_install("snowflake")
 ```
 
 Driver functions like `dbc::sqlite()` auto-install on first use by default. To disable:
@@ -54,6 +54,6 @@ dbDisconnect(con)
 ### Search available drivers
 
 ```r
-dbc::search()
+dbc::dbc_search()
 #> [1] "sqlite"     "snowflake"  "postgresql" ...
 ```

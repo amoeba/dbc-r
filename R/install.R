@@ -7,7 +7,7 @@
 #' @return Invisibly returns \code{NULL} on success; stops with an error
 #'   message on failure.
 #' @export
-install <- function(driver) {
+dbc_install <- function(driver) {
   stopifnot(is.character(driver), length(driver) == 1L)
   invisible(.Call(C_dbc_install, driver))
 }

@@ -242,11 +242,11 @@ SEXP dbc_info_r(SEXP driver_name_sexp) {
 #include <R_ext/Rdynload.h>
 
 static const R_CallMethodDef call_methods[] = {
-    {"dbc_install",      (DL_FUNC) &dbc_install_r,      1},
-    {"dbc_search",       (DL_FUNC) &dbc_search_r,       1},
-    {"dbc_uninstall",    (DL_FUNC) &dbc_uninstall_r,    1},
-    {"dbc_list_drivers", (DL_FUNC) &dbc_list_drivers_r, 0},
-    {"dbc_info",         (DL_FUNC) &dbc_info_r,         1},
+    {"dbc_install_c",      (DL_FUNC) &dbc_install_r,      1},
+    {"dbc_search_c",       (DL_FUNC) &dbc_search_r,       1},
+    {"dbc_uninstall_c",    (DL_FUNC) &dbc_uninstall_r,    1},
+    {"dbc_list_drivers_c", (DL_FUNC) &dbc_list_drivers_r, 0},
+    {"dbc_info_c",         (DL_FUNC) &dbc_info_r,         1},
     {NULL, NULL, 0}
 };
 

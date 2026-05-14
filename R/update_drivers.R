@@ -1,6 +1,6 @@
 #' Regenerate driver helper functions from the dbc registry
 #'
-#' Queries the registry (via [search()]), then writes
+#' Queries the registry (via [dbc_search()]), then writes
 #' \file{R/drivers-generated.R} with one DBI driver constructor per available
 #' driver.  Also updates \file{NAMESPACE} to export every generated function.
 #'
@@ -12,7 +12,7 @@
 #' @return Invisibly returns a character vector of driver names that were
 #'   generated.
 update_drivers <- function(pkg = ".") {
-  drivers <- search("")
+  drivers <- dbc_search("")
   if (length(drivers) == 0L) stop("dbc registry returned no drivers")
 
   # Produce a valid R identifier from a driver path like "adbc-sqlite" or

@@ -6,6 +6,6 @@
 #'   \code{level} (\code{"user"}, \code{"system"}, or \code{"env"}), and
 #'   \code{path}.
 #' @export
-list_drivers <- function() {
+dbc_list_drivers <- function() {
   .Call(C_dbc_list_drivers)
 }
