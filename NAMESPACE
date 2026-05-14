@@ -1,3 +1,4 @@
 export(install)
+export(search)
 export(sqlite)
 useDynLib(dbc, .registration = TRUE)
