@@ -10,5 +10,4 @@ NeedsCompilation: yes
 Suggests:
     adbi,
     adbcdrivermanager,
-    DBI,
-    gh
+    DBI
