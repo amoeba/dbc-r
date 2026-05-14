@@ -21,6 +21,5 @@ sqlite <- function() {
     stop("Package 'adbcdrivermanager' is required. Install it with install.packages('adbcdrivermanager').")
   }
 
-  drv <- adbcdrivermanager::adbc_driver("sqlite")
-  adbi::adbi(drv)
+  adbi::adbi(load_driver("sqlite"))
 }
