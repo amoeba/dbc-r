@@ -31,7 +31,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Build and install dbc package
-        run: R CMD INSTALL .
+        run: R CMD INSTALL --preclean .
 
       - name: Regenerate driver bindings
         run: |
@@ -40,7 +40,13 @@ jobs:
       - name: Check for changes
         id: diff
         run: |
-          git diff --quiet R/drivers-generated.R NAMESPACE && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+          # git status --porcelain covers both modified tracked files and new
+          # untracked files (e.g. R/drivers-generated.R on the first run).
+          if [ -n "$(git status --porcelain R/drivers-generated.R NAMESPACE)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Open PR if bindings changed
         if: steps.diff.outputs.changed == 'true'
