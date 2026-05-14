@@ -10,4 +10,6 @@ NeedsCompilation: yes
 Suggests:
     adbi,
     adbcdrivermanager,
-    DBI
+    DBI,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
