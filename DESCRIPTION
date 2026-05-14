@@ -7,3 +7,7 @@ Description: Wraps the dbc Go client API so ADBC drivers can be installed from
 License: Apache License (>= 2)
 Encoding: UTF-8
 NeedsCompilation: yes
+Suggests:
+    adbi,
+    adbcdrivermanager,
+    DBI
