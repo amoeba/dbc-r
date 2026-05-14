@@ -1,4 +1,4 @@
 export(install)
 export(search)
 export(sqlite)
-useDynLib(dbc, .registration = TRUE)
+useDynLib(dbc, C_dbc_install = dbc_install, C_dbc_search = dbc_search, .registration = TRUE)
