@@ -1,0 +1,19 @@
+# Build the Go code as a C archive, then link it into the R shared library.
+
+GO = go
+GOFLAGS = -buildmode=c-archive
+
+GODIR = go
+GOARCHIVE = libdbcgo.a
+
+PKG_LIBS = $(GOARCHIVE) -lresolv
+
+all: $(SHLIB)
+
+$(SHLIB): $(GOARCHIVE)
+
+$(GOARCHIVE): $(GODIR)/dbc_install.go $(GODIR)/dbc_search.go $(GODIR)/go.mod
+	cd $(GODIR) && $(GO) build $(GOFLAGS) -o ../$(GOARCHIVE) .
+
+clean:
+	rm -f $(GOARCHIVE) libdbcgo.h

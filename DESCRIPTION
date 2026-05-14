@@ -1,0 +1,9 @@
+Package: dbc
+Title: Install ADBC Drivers via dbc
+Version: 0.1.0
+Authors@R: person("Bryce", role = c("aut", "cre"), email = "bryce@example.com")
+Description: Wraps the dbc Go client API so ADBC drivers can be installed from
+    R with dbc::install("snowflake").
+License: Apache License (>= 2)
+Encoding: UTF-8
+NeedsCompilation: yes

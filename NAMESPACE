@@ -1,0 +1,2 @@
+export(install)
+useDynLib(dbc, .registration = TRUE)
