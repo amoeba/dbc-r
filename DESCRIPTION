@@ -13,7 +13,11 @@ Imports:
     DBI,
     methods
 Suggests:
-    testthat (>= 3.0.0)
+    mockery,
+    paws.common,
+    paws.database,
+    testthat (>= 3.0.0),
+    withr
 Collate:
     'aaa-imports.R'
     'driver.R'
