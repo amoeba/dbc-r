@@ -28,8 +28,10 @@ mssql <- function() {
 #' @param database Database name.
 #' @param uid User name.
 #' @param pwd Password.
+#' @param encrypt Encrypt the connection. Defaults to \code{TRUE}.
 #' @param uri Full connection URI. When supplied, overrides all other
-#'   individual parameters.
+#'   individual parameters (but \code{encrypt} is still appended unless
+#'   already present).
 #' @param ... Additional options passed directly to the ADBC driver.
 #' @rdname mssql
 #' @export
@@ -39,11 +41,16 @@ setMethod("dbConnect", "MssqlDriver", function(drv,
   database = NULL,
   uid      = NULL,
   pwd      = NULL,
+  encrypt  = TRUE,
   uri      = NULL,
   ...
 ) {
   if (is.null(uri)) {
     uri <- build_uri("mssql", server, port, database, uid, pwd)
+  }
+  if (!is.null(uri) && !grepl("[?&][Ee]ncrypt=", uri)) {
+    sep <- if (grepl("?", uri, fixed = TRUE)) "&" else "?"
+    uri <- paste0(uri, sep, "Encrypt=", if (isTRUE(encrypt)) "true" else "false")
   }
   promote_connection("MssqlConnection", callNextMethod(drv, uri = uri, ...))
 })

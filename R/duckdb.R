@@ -20,9 +20,16 @@ duckdb <- function() {
 #' @param drv A \code{DuckdbDriver} object from [duckdb()].
 #' @param uri Path to a DuckDB database file, or \code{":memory:"} for an
 #'   in-memory database. Defaults to \code{":memory:"}.
+#' @param read_only Open the database in read-only mode. Defaults to
+#'   \code{FALSE}.
 #' @param ... Additional options passed directly to the ADBC driver.
 #' @rdname duckdb
 #' @export
-setMethod("dbConnect", "DuckdbDriver", function(drv, uri = ":memory:", ...) {
-  promote_connection("DuckdbConnection", callNextMethod(drv, uri = uri, ...))
+setMethod("dbConnect", "DuckdbDriver", function(drv, uri = ":memory:",
+  read_only = FALSE, ...) {
+  opts <- adbc_opts(
+    uri               = uri,
+    "duckdb.read_only" = if (isTRUE(read_only)) "true" else NULL
+  )
+  promote_connection("DuckdbConnection", adbi_connect(drv, opts, list(...)))
 })
