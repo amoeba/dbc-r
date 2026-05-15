@@ -7,9 +7,38 @@ Description: Wraps the dbc Go client API so ADBC drivers can be installed from
 License: Apache License (>= 2)
 Encoding: UTF-8
 NeedsCompilation: yes
-Suggests:
+Imports:
     adbi,
     adbcdrivermanager,
     DBI,
+    methods
+Suggests:
     testthat (>= 3.0.0)
+Collate:
+    'aaa-imports.R'
+    'driver.R'
+    'bigquery.R'
+    'clickhouse.R'
+    'databricks.R'
+    'duckdb.R'
+    'exasol.R'
+    'flightsql.R'
+    'info.R'
+    'install.R'
+    'list_drivers.R'
+    'mssql.R'
+    'mysql.R'
+    'oracle.R'
+    'postgresql.R'
+    'redshift.R'
+    'sap_hana.R'
+    'search.R'
+    'singlestore.R'
+    'snowflake.R'
+    'sqlite.R'
+    'teradata.R'
+    'trino.R'
+    'uninstall.R'
+    'update_drivers.R'
+    'drivers-generated.R'
 Config/testthat/edition: 3
