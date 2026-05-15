@@ -1,88 +1,90 @@
 # dbc
 
-An R package that wraps the [dbc](https://github.com/columnar-tech/dbc) Go client to install ADBC drivers and return DBI-compatible driver objects.
+An R package that provides a single entry point for using any [ADBC](https://arrow.apache.org/adbc/) database driver from R. Drivers are installed on-demand from the [dbc](https://github.com/adbc-drivers/dbc) registry and exposed as standard DBI driver objects.
 
 ## Installation
 
 ```r
 # install.packages("remotes")
-remotes::install_github("columnar-tech/dbc-r")
+remotes::install_github("adbc-drivers/dbc-r")
 ```
 
 ## Usage
 
-### Install a driver
+### Connect to a database
 
 ```r
-dbc::dbc_install("sqlite")
-dbc::dbc_install("snowflake")
+library(DBI)
+
+# SQLite
+con <- dbConnect(dbc::driver("sqlite"), uri = ":memory:")
+
+# PostgreSQL
+con <- dbConnect(dbc::driver("postgresql"),
+  uri = "postgresql://user:pass@localhost:5432/mydb"
+)
+
+# Snowflake
+con <- dbConnect(dbc::driver("snowflake"),
+  "adbc.snowflake.sql.account" = "myorg-myaccount",
+  "adbc.snowflake.sql.warehouse" = "COMPUTE_WH"
+)
+
+# DuckDB
+con <- dbConnect(dbc::driver("duckdb"), uri = ":memory:")
 ```
 
-Driver functions like `dbc::sqlite()` auto-install on first use by default. To disable:
+Drivers are auto-installed on first use. To disable:
 
 ```r
 options(dbc.autoinstall = FALSE)
 ```
 
-### Connect with DBI
+### Query
 
 ```r
-library(DBI)
+con <- dbConnect(dbc::driver("sqlite"), uri = ":memory:")
 
-con <- dbConnect(dbc::sqlite(), uri = ":memory:")
-
-# Write a table
 dbWriteTable(con, "swiss", datasets::swiss)
-
-# Query it
 dbGetQuery(con, "SELECT * FROM swiss WHERE Agriculture < 40")
 
-# Prepared statements
-res <- dbSendQuery(con, "SELECT * FROM swiss WHERE Agriculture < ?")
-
-dbBind(res, list(30))
-dbFetch(res)
-
-dbBind(res, list(20))
-dbFetch(res)
-
-# Cleanup
-dbClearResult(res)
 dbDisconnect(con)
 ```
 
 ### Use with dbplyr
 
 ```r
-library(DBI)
 library(dplyr)
 
-con <- dbConnect(dbc::sqlite(), uri = ":memory:")
-
+con <- dbConnect(dbc::driver("sqlite"), uri = ":memory:")
 dbWriteTable(con, "swiss", datasets::swiss)
 
-swiss_tbl <- tbl(con, "swiss")
-
-# Queries are translated to SQL and executed lazily
-swiss_tbl |>
+tbl(con, "swiss") |>
   filter(Agriculture < 40) |>
   select(Agriculture, Education, Fertility) |>
-  arrange(desc(Fertility))
-
-# Collect results into a local data frame
-swiss_tbl |>
-  group_by(Catholic > 50) |>
-  summarise(mean_fertility = mean(Fertility, na.rm = TRUE)) |>
+  arrange(desc(Fertility)) |>
   collect()
 
 dbDisconnect(con)
 ```
 
-### Search available drivers
+### Search and manage drivers
 
 ```r
-dbc::dbc_search()
-#> [1] "bigquery"    "clickhouse"  "databricks"  "duckdb"      "exasol"
-#> [6] "flightsql"   "mssql"       "mysql"       "postgresql"  "redshift"
+# Find available drivers
+dbc::dbc_search("")
+#> [1] "bigquery"    "clickhouse"  "databricks"  "duckdb"      "flightsql"
+#> [6] "mssql"       "mysql"       "oracle"      "postgresql"  "redshift"
 #> ...
+
+# Manually install/uninstall
+dbc::dbc_install("snowflake")
+dbc::dbc_uninstall("snowflake")
+
+# List installed drivers
+dbc::dbc_list_drivers()
 ```
+
+### IDE support
+
+Connections are automatically registered with the RStudio or Positron Connections pane when available — providing an object browser, disconnect button, and table previews.
