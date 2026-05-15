@@ -69,7 +69,7 @@ setMethod("dbConnect", "SnowflakeDriver", function(drv,
 
   # If a token is available and authenticator is still unset, use oauth
   if (!is.null(token) && is.null(authenticator)) {
-    authenticator <- "oauth"
+    authenticator <- "auth_oauth"
   }
 
   opts <- adbc_opts(
@@ -79,7 +79,7 @@ setMethod("dbConnect", "SnowflakeDriver", function(drv,
     "adbc.snowflake.sql.schema"                   = schema,
     "username"                                    = uid,
     "password"                                    = pwd,
-    "adbc.snowflake.sql.client_option.token"      = token,
+    "adbc.snowflake.sql.client_option.auth_token"  = token,
     "adbc.snowflake.sql.auth_type"                = authenticator,
     "adbc.snowflake.sql.role"                     = role
   )
@@ -107,7 +107,7 @@ snowflake_credentials <- function(uid, pwd, token, authenticator, account) {
       error = function(e) NULL
     )
     if (!is.null(viewer_token)) {
-      return(list(token = viewer_token, authenticator = "oauth"))
+      return(list(token = viewer_token, authenticator = "auth_oauth"))
     }
   }
 
@@ -117,14 +117,14 @@ snowflake_credentials <- function(uid, pwd, token, authenticator, account) {
     tok <- tryCatch(trimws(readLines(token_file, warn = FALSE)[[1L]]),
                     error = function(e) NULL)
     if (!is.null(tok) && nzchar(tok)) {
-      return(list(token = tok, authenticator = "oauth"))
+      return(list(token = tok, authenticator = "auth_oauth"))
     }
   }
 
   # 3. SNOWFLAKE_TOKEN environment variable
   env_token <- Sys.getenv("SNOWFLAKE_TOKEN")
   if (nzchar(env_token)) {
-    return(list(token = env_token, authenticator = "oauth"))
+    return(list(token = env_token, authenticator = "auth_oauth"))
   }
 
   list(token = NULL, authenticator = authenticator)

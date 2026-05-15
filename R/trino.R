@@ -26,11 +26,13 @@ trino <- function() {
 #' @param host Server hostname.
 #' @param port Server port. Defaults to \code{8080}.
 #' @param catalog Catalog name.
-#' @param schema Schema name.
+#' @param schema Schema name. Appended as a query parameter on the URI
+#'   (\code{?schema=...}).
 #' @param uid User name.
 #' @param pwd Password.
 #' @param uri Full Trino connection URI. When supplied, overrides all other
-#'   individual parameters.
+#'   individual parameters (but \code{schema} is still appended unless already
+#'   present).
 #' @param ... Additional options passed directly to the ADBC driver.
 #' @rdname trino
 #' @export
@@ -47,9 +49,10 @@ setMethod("dbConnect", "TrinoDriver", function(drv,
   if (is.null(uri)) {
     uri <- build_uri("http", host, port, catalog, uid, pwd)
   }
-  opts <- adbc_opts(
-    uri                    = uri,
-    "adbc.trino.schema"   = schema
-  )
-  promote_connection("TrinoConnection", adbi_connect(drv, opts, list(...)))
+  # Schema is not a db-init option in the Trino ADBC driver; embed in the URI.
+  if (!is.null(uri) && !is.null(schema) && !grepl("[?&]schema=", uri)) {
+    sep <- if (grepl("?", uri, fixed = TRUE)) "&" else "?"
+    uri <- paste0(uri, sep, "schema=", schema)
+  }
+  promote_connection("TrinoConnection", callNextMethod(drv, uri = uri, ...))
 })

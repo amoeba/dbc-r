@@ -28,8 +28,8 @@ duckdb <- function() {
 setMethod("dbConnect", "DuckdbDriver", function(drv, uri = ":memory:",
   read_only = FALSE, ...) {
   opts <- adbc_opts(
-    uri               = uri,
-    "duckdb.read_only" = if (isTRUE(read_only)) "true" else NULL
+    uri           = uri,
+    "access_mode" = if (isTRUE(read_only)) "READ_ONLY" else NULL
   )
   promote_connection("DuckdbConnection", adbi_connect(drv, opts, list(...)))
 })

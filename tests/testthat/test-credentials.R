@@ -25,7 +25,7 @@ test_that("snowflake_credentials: SNOWFLAKE_TOKEN env var", {
     res <- dbc:::snowflake_credentials(uid = NULL, pwd = NULL, token = NULL,
                                        authenticator = NULL, account = "acct")
     expect_equal(res$token, "envtoken")
-    expect_equal(res$authenticator, "oauth")
+    expect_equal(res$authenticator, "auth_oauth")
   })
 })
 

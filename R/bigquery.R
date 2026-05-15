@@ -48,9 +48,9 @@ setMethod("dbConnect", "BigqueryDriver", function(drv,
     or_null(Sys.getenv("GOOGLE_CLOUD_PROJECT"))
 
   opts <- adbc_opts(
-    "adbc.bigquery.project_id" = project_id,
-    "adbc.bigquery.dataset_id" = dataset,
-    "adbc.bigquery.auth_type"  = auth_type
+    "adbc.bigquery.sql.project_id" = project_id,
+    "adbc.bigquery.sql.dataset_id" = dataset,
+    "adbc.bigquery.sql.auth_type"  = auth_type
   )
   promote_connection("BigqueryConnection", adbi_connect(drv, opts, list(...)))
 })

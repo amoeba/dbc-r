@@ -64,11 +64,11 @@ setMethod("dbConnect", "DatabricksDriver", function(drv,
   token <- token %||% databricks_credentials(workspace)
 
   opts <- adbc_opts(
-    "adbc.spark.host"      = workspace,
-    "adbc.spark.http_path" = http_path,
-    "adbc.spark.token"     = token,
-    "adbc.spark.catalog"   = catalog,
-    "adbc.spark.schema"    = schema
+    "databricks.server_hostname" = workspace,
+    "databricks.http_path"       = http_path,
+    "databricks.access_token"    = token,
+    "databricks.catalog"         = catalog,
+    "databricks.schema"          = schema
   )
   promote_connection("DatabricksConnection", adbi_connect(drv, opts, list(...)))
 })
