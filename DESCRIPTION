@@ -17,6 +17,7 @@ Suggests:
     testthat (>= 3.0.0)
 Collate:
     'aaa-imports.R'
+    'dbc-package.R'
     'driver.R'
     'info.R'
     'install.R'
@@ -24,3 +25,4 @@ Collate:
     'search.R'
     'uninstall.R'
 Config/testthat/edition: 3
+RoxygenNote: 7.3.3
