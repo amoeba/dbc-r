@@ -1,20 +1,24 @@
 # dbc
 
-An R package that provides a single entry point for using any [ADBC](https://arrow.apache.org/adbc/) database driver from R. Drivers are installed on-demand from the [dbc](https://github.com/adbc-drivers/dbc) registry and exposed as standard DBI driver objects.
 
 ## Installation
 
 ```r
 # install.packages("remotes")
-remotes::install_github("adbc-drivers/dbc-r")
+remotes::install_github("amoeba/dbc-r")
 ```
 
 ## Usage
 
 ```r
+library(dbc)
 library(DBI)
 library(dplyr)
 
+# Install the duckdb ADBC driver
+dbc::dbc_install("duckdb")
+
+# Pass it to dbConnect
 con <- dbConnect(dbc::driver("duckdb"), uri = ":memory:")
 
 dbWriteTable(con, "swiss", datasets::swiss)
@@ -49,27 +53,24 @@ con <- dbConnect(dbc::driver("snowflake"),
 con <- dbConnect(dbc::driver("duckdb"), uri = "my_data.duckdb")
 ```
 
-Drivers are auto-installed on first use. To disable:
-
-```r
-options(dbc.autoinstall = FALSE)
-```
 
 ### Search and manage drivers
 
 ```r
 # Find available drivers
-dbc::dbc_search("")
+dbc::dbc_search()
 #> [1] "bigquery"    "clickhouse"  "databricks"  "duckdb"      "flightsql"
 #> [6] "mssql"       "mysql"       "oracle"      "postgresql"  "redshift"
 #> ...
 
-# Manually install/uninstall
+# Install/uninstall drivers
 dbc::dbc_install("snowflake")
 dbc::dbc_uninstall("snowflake")
 
 # List installed drivers
-dbc::dbc_list_drivers()
+dbc::dbc_list()
+
+# See ?dbc for more info
 ```
 
 ### IDE support
