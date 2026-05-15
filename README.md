@@ -11,11 +11,26 @@ remotes::install_github("adbc-drivers/dbc-r")
 
 ## Usage
 
-### Connect to a database
-
 ```r
 library(DBI)
+library(dplyr)
 
+con <- dbConnect(dbc::driver("duckdb"), uri = ":memory:")
+
+dbWriteTable(con, "swiss", datasets::swiss)
+
+tbl(con, "swiss") |>
+  filter(Agriculture < 40) |>
+  select(Agriculture, Education, Fertility) |>
+  arrange(desc(Fertility)) |>
+  collect()
+
+dbDisconnect(con)
+```
+
+### Connect to any database
+
+```r
 # SQLite
 con <- dbConnect(dbc::driver("sqlite"), uri = ":memory:")
 
@@ -31,41 +46,13 @@ con <- dbConnect(dbc::driver("snowflake"),
 )
 
 # DuckDB
-con <- dbConnect(dbc::driver("duckdb"), uri = ":memory:")
+con <- dbConnect(dbc::driver("duckdb"), uri = "my_data.duckdb")
 ```
 
 Drivers are auto-installed on first use. To disable:
 
 ```r
 options(dbc.autoinstall = FALSE)
-```
-
-### Query
-
-```r
-con <- dbConnect(dbc::driver("sqlite"), uri = ":memory:")
-
-dbWriteTable(con, "swiss", datasets::swiss)
-dbGetQuery(con, "SELECT * FROM swiss WHERE Agriculture < 40")
-
-dbDisconnect(con)
-```
-
-### Use with dbplyr
-
-```r
-library(dplyr)
-
-con <- dbConnect(dbc::driver("sqlite"), uri = ":memory:")
-dbWriteTable(con, "swiss", datasets::swiss)
-
-tbl(con, "swiss") |>
-  filter(Agriculture < 40) |>
-  select(Agriculture, Education, Fertility) |>
-  arrange(desc(Fertility)) |>
-  collect()
-
-dbDisconnect(con)
 ```
 
 ### Search and manage drivers
@@ -87,4 +74,4 @@ dbc::dbc_list_drivers()
 
 ### IDE support
 
-Connections are automatically registered with the RStudio or Positron Connections pane when available — providing an object browser, disconnect button, and table previews.
+Connections are automatically registered with the RStudio or Positron Connections pane — providing an object browser, disconnect button, and table previews.
