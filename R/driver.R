@@ -1,51 +1,63 @@
 # Return y if x is NULL, else x.
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
-# Return NULL if s is an empty string (i.e. Sys.getenv() found nothing).
-or_null <- function(s) if (nzchar(s)) s else NULL
-
-# Build a standard connection URI from parts. Returns NULL if host is absent.
-# Used by per-driver dbConnect() methods when the caller omits the uri param.
-build_uri <- function(scheme, host, port, database = NULL,
-                      uid = NULL, pwd = NULL) {
-  if (is.null(host) || !nzchar(host)) return(NULL)
-  auth <- ""
-  if (!is.null(uid) && nzchar(uid)) {
-    auth <- if (!is.null(pwd) && nzchar(pwd)) {
-      paste0(uid, ":", pwd, "@")
-    } else {
-      paste0(uid, "@")
-    }
-  }
-  db <- if (!is.null(database) && nzchar(database)) paste0("/", database) else ""
-  paste0(scheme, "://", auth, host, ":", port, db)
+#' Create a DBI driver for any ADBC-supported database
+#'
+#' Returns a DBI driver object backed by the named ADBC driver. The driver is
+#' installed automatically if not already present (controlled by
+#' \code{getOption("dbc.autoinstall", TRUE)}).
+#'
+#' Pass the result to [DBI::dbConnect()] along with connection options
+#' (typically \code{uri} or driver-specific key-value pairs).
+#'
+#' @param name Driver name (e.g. \code{"sqlite"}, \code{"snowflake"},
+#'   \code{"postgresql"}, \code{"duckdb"}). Use [dbc_search()] to discover
+#'   available drivers.
+#' @return A \code{DbcDriver} object for use with [DBI::dbConnect()].
+#' @export
+#' @examples
+#' \dontrun{
+#' # SQLite
+#' con <- DBI::dbConnect(dbc::driver("sqlite"), uri = ":memory:")
+#'
+#' # Snowflake
+#' con <- DBI::dbConnect(dbc::driver("snowflake"),
+#'   "adbc.snowflake.sql.account" = "myorg-myaccount"
+#' )
+#'
+#' # PostgreSQL
+#' con <- DBI::dbConnect(dbc::driver("postgresql"),
+#'   uri = "postgresql://user:pass@localhost:5432/mydb"
+#' )
+#'
+#' DBI::dbDisconnect(con)
+#' }
+driver <- function(name) {
+  new("DbcDriver", driver = load_driver(name), name = name)
 }
 
-# Drop NULL entries from a named list of ADBC options.
-adbc_opts <- function(...) Filter(Negate(is.null), list(...))
+setClass("DbcDriver", contains = "AdbiDriver", slots = list(name = "character"))
 
-# Call adbi's dbConnect(AdbiDriver, ...) directly, bypassing our per-driver
-# S4 dispatch. Used when we need to assemble opts via do.call rather than
-# passing them as literal arguments (where callNextMethod would be fragile).
-adbi_connect <- function(drv, opts, dots) {
-  base_drv <- new("AdbiDriver", driver = drv@driver)
-  do.call(DBI::dbConnect, c(list(base_drv), opts, dots))
-}
+#' @param drv A \code{DbcDriver} object from [driver()].
+#' @param ... Connection options passed to the ADBC driver (e.g. \code{uri},
+#'   or driver-specific options like
+#'   \code{"adbc.snowflake.sql.account" = "..."}).
+#' @rdname driver
+#' @export
+setMethod("dbConnect", "DbcDriver", function(drv, ...) {
+  con <- callNextMethod()
+  dots <- list(...)
+  # Best-effort display name: use uri, or first named option value, or driver name
+  label <- dots$uri %||% dots[[1]] %||% drv@name
+  register_connection_observer(con,
+    type         = drv@name,
+    display_name = label,
+    host         = dots$uri %||% label,
+    connect_code = paste0('DBI::dbConnect(dbc::driver("', drv@name, '"), ...)'))
+  con
+})
 
-# Promote an AdbiConnection to a per-driver subclass by copying all slots.
-promote_connection <- function(class, con) {
-  new(class,
-      database               = con@database,
-      connection             = con@connection,
-      metadata               = con@metadata,
-      bigint                 = con@bigint,
-      rows_affected_callback = con@rows_affected_callback)
-}
-
-# Internal helper used by all driver constructor functions (sqlite, snowflake,
-# etc.). Tries to load the named ADBC driver; if the load fails and
-# getOption("dbc.autoinstall") is TRUE (the default), installs the driver
-# first and retries.
+# Internal: load a named ADBC driver, auto-installing if needed.
 load_driver <- function(name) {
   result <- tryCatch(
     adbcdrivermanager::adbc_driver(name),
@@ -64,3 +76,80 @@ load_driver <- function(name) {
   dbc_install(name)
   adbcdrivermanager::adbc_driver(name)
 }
+
+# ---------------------------------------------------------------------------
+# Connection observer (RStudio / Positron Connections pane)
+# ---------------------------------------------------------------------------
+
+# Registry mapping connection keys to observer metadata.
+.dbc_obs <- new.env(hash = TRUE, parent = emptyenv())
+.dbc_obs$.next_id <- 1L
+
+# Register a connection with the IDE Connections pane.
+# Works identically in RStudio and Positron (both set the connectionObserver
+# option with the same callback interface).
+register_connection_observer <- function(con, type, display_name, host,
+                                          connect_code) {
+  observer <- getOption("connectionObserver")
+  if (is.null(observer)) return(invisible(con))
+
+  key <- as.character(.dbc_obs$.next_id)
+  .dbc_obs$.next_id <- .dbc_obs$.next_id + 1L
+  .dbc_obs[[key]] <- list(type = type, host = host %||% "",
+                           display_name = display_name)
+  attr(con, ".dbc_obs_key") <- key
+
+  observer$connectionOpened(
+    type             = type,
+    displayName      = display_name,
+    host             = host %||% "",
+    connectCode      = connect_code,
+    disconnect       = function() DBI::dbDisconnect(con),
+    connectionObject = con,
+    listObjectTypes  = function() {
+      list(schema = list(contains = list(table = list(contains = "data"))))
+    },
+    listObjects      = function(schema = NULL, ...) {
+      if (is.null(schema)) {
+        schemas <- tryCatch(
+          DBI::dbGetQuery(con,
+            "SELECT schema_name FROM information_schema.schemata")[[1]],
+          error = function(e) character(0))
+        data.frame(name = schemas, type = "schema", stringsAsFactors = FALSE)
+      } else {
+        tbls <- tryCatch(DBI::dbListTables(con),
+                         error = function(e) character(0))
+        data.frame(name = tbls, type = "table", stringsAsFactors = FALSE)
+      }
+    },
+    listColumns      = function(schema = NULL, table = NULL, ...) {
+      tbl <- if (!is.null(schema)) DBI::Id(schema = schema, table = table) else table
+      fields <- tryCatch(DBI::dbListFields(con, tbl),
+                         error = function(e) character(0))
+      data.frame(name = fields, type = "column", stringsAsFactors = FALSE)
+    },
+    previewObject    = function(rowLimit, schema = NULL, table = NULL, ...) {
+      tryCatch(
+        DBI::dbGetQuery(con, paste("SELECT * FROM", table, "LIMIT", rowLimit)),
+        error = function(e) data.frame()
+      )
+    }
+  )
+  invisible(con)
+}
+
+setMethod("dbDisconnect", "AdbiConnection", function(conn, ...) {
+  observer <- getOption("connectionObserver")
+  if (!is.null(observer)) {
+    key  <- attr(conn, ".dbc_obs_key")
+    meta <- if (!is.null(key)) .dbc_obs[[key]] else NULL
+    if (!is.null(meta)) {
+      observer$connectionClosed(type        = meta$type,
+                                 host        = meta$host,
+                                 displayName = meta$display_name)
+      rm(list = key, envir = .dbc_obs)
+    }
+  }
+  getMethod("dbDisconnect", "AdbiConnection",
+            where = asNamespace("adbi"))(conn, ...)
+})

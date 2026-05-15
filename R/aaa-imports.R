@@ -1,5 +1,6 @@
 #' @import methods
 #' @import DBI
+#' @importClassesFrom adbi AdbiDriver AdbiConnection
 #' @importFrom adbi adbi
 #' @importFrom adbcdrivermanager adbc_driver
 NULL

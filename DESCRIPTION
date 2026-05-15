@@ -1,9 +1,10 @@
 Package: dbc
-Title: Install ADBC Drivers via dbc
+Title: Install and Use ADBC Drivers via dbc
 Version: 0.1.0
 Authors@R: person("Bryce", role = c("aut", "cre"), email = "bryce@example.com")
-Description: Wraps the dbc Go client API so ADBC drivers can be installed from
-    R with dbc::install("snowflake").
+Description: Provides a single entry point for using any ADBC database driver
+    from R. Drivers are installed on-demand via the dbc registry and exposed
+    as standard DBI driver objects.
 License: Apache License (>= 2)
 Encoding: UTF-8
 NeedsCompilation: yes
@@ -13,36 +14,13 @@ Imports:
     DBI,
     methods
 Suggests:
-    mockery,
-    paws.common,
-    paws.database,
-    testthat (>= 3.0.0),
-    withr
+    testthat (>= 3.0.0)
 Collate:
     'aaa-imports.R'
     'driver.R'
-    'bigquery.R'
-    'clickhouse.R'
-    'databricks.R'
-    'duckdb.R'
-    'exasol.R'
-    'flightsql.R'
     'info.R'
     'install.R'
     'list_drivers.R'
-    'mssql.R'
-    'mysql.R'
-    'oracle.R'
-    'postgresql.R'
-    'redshift.R'
-    'sap_hana.R'
     'search.R'
-    'singlestore.R'
-    'snowflake.R'
-    'sqlite.R'
-    'teradata.R'
-    'trino.R'
     'uninstall.R'
-    'update_drivers.R'
-    'drivers-generated.R'
 Config/testthat/edition: 3
