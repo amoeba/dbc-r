@@ -7,7 +7,7 @@
 extern char *dbc_install(const char *driver_name);
 extern char *dbc_search(const char *pattern);
 extern char *dbc_uninstall(const char *driver_name);
-extern char *dbc_list_drivers(void);
+extern char *dbc_list(void);
 extern char *dbc_info(const char *driver_name);
 
 /* R-callable entry point: .Call(C_dbc_install, driver_name_sexp) */
@@ -97,10 +97,10 @@ SEXP dbc_uninstall_r(SEXP driver_name_sexp) {
     return R_NilValue;
 }
 
-/* R-callable entry point: .Call(C_dbc_list_drivers) */
+/* R-callable entry point: .Call(C_dbc_list) */
 /* Returns a data.frame with columns: id, name, version, level, path */
-SEXP dbc_list_drivers_r(void) {
-    char *result = dbc_list_drivers();
+SEXP dbc_list_r(void) {
+    char *result = dbc_list();
 
     /* Count rows */
     int n = 0;
@@ -245,7 +245,7 @@ static const R_CallMethodDef call_methods[] = {
     {"dbc_install_c",      (DL_FUNC) &dbc_install_r,      1},
     {"dbc_search_c",       (DL_FUNC) &dbc_search_r,       1},
     {"dbc_uninstall_c",    (DL_FUNC) &dbc_uninstall_r,    1},
-    {"dbc_list_drivers_c", (DL_FUNC) &dbc_list_drivers_r, 0},
+    {"dbc_list_c", (DL_FUNC) &dbc_list_r, 0},
     {"dbc_info_c",         (DL_FUNC) &dbc_info_r,         1},
     {NULL, NULL, 0}
 };

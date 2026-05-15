@@ -65,7 +65,7 @@ R/
   install.R                # dbc_install() (unchanged)
   search.R                 # dbc_search() (unchanged)
   uninstall.R              # dbc_uninstall() (unchanged)
-  list_drivers.R           # dbc_list_drivers() (unchanged)
+  list_drivers.R           # dbc_list() (unchanged)
   info.R                   # dbc_info() (unchanged)
   update_drivers.R         # dev/CI tool (update to generate new skeleton)
 

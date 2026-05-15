@@ -13,12 +13,12 @@ import (
 	"github.com/columnar-tech/dbc/config"
 )
 
-// dbc_list_drivers returns installed drivers as a tab-delimited table
+// dbc_list returns installed drivers as a tab-delimited table
 // (id, name, version, level, path), one row per line.
 // Returns "ERROR:<msg>" on failure. The caller must free() the result.
 //
-//export dbc_list_drivers
-func dbc_list_drivers() *C.char {
+//export dbc_list
+func dbc_list() *C.char {
 	cfgs := config.Get()
 
 	type row struct {

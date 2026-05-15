@@ -3,9 +3,8 @@
 
 #' Create a DBI driver for any ADBC-supported database
 #'
-#' Returns a DBI driver object backed by the named ADBC driver. The driver is
-#' installed automatically if not already present (controlled by
-#' \code{getOption("dbc.autoinstall", TRUE)}).
+#' Returns a DBI driver object backed by the named ADBC driver. The driver
+#' must be installed first via [dbc_install()].
 #'
 #' Pass the result to [DBI::dbConnect()] along with connection options
 #' (typically \code{uri} or driver-specific key-value pairs).
@@ -57,23 +56,8 @@ setMethod("dbConnect", "DbcDriver", function(drv, ...) {
   con
 })
 
-# Internal: load a named ADBC driver, auto-installing if needed.
+# Internal: load a named ADBC driver.
 load_driver <- function(name) {
-  result <- tryCatch(
-    adbcdrivermanager::adbc_driver(name),
-    error = function(e) e
-  )
-
-  if (!inherits(result, "error")) {
-    return(result)
-  }
-
-  if (!isTRUE(getOption("dbc.autoinstall", default = TRUE))) {
-    stop(result)
-  }
-
-  message("Driver '", name, "' not found, installing via dbc...")
-  dbc_install(name)
   adbcdrivermanager::adbc_driver(name)
 }
 
