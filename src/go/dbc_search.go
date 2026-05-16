@@ -14,12 +14,15 @@ import (
 )
 
 // dbc_search returns a newline-delimited list of driver paths matching
-// pattern (empty string returns all drivers). On error the return value
-// starts with "ERROR:". The caller must free() the returned string.
+// pattern (empty string returns all drivers).
+// pre controls whether pre-release drivers are included.
+// On error the return value starts with "ERROR:".
+// The caller must free() the returned string.
 //
 //export dbc_search
-func dbc_search(pattern *C.char) *C.char {
+func dbc_search(pattern *C.char, pre C.int) *C.char {
 	pat := C.GoString(pattern)
+	includePre := pre != 0
 
 	client, err := dbc.NewClient()
 	if err != nil {
@@ -31,8 +34,16 @@ func dbc_search(pattern *C.char) *C.char {
 		return C.CString(fmt.Sprintf("ERROR:%s", err))
 	}
 
-	paths := make([]string, len(drivers))
-	for i, d := range drivers {
+	// Filter out drivers that only have pre-release versions unless includePre is set
+	var filtered []dbc.Driver
+	for _, d := range drivers {
+		if includePre || d.HasNonPrerelease() || len(d.PkgInfo) == 0 {
+			filtered = append(filtered, d)
+		}
+	}
+
+	paths := make([]string, len(filtered))
+	for i, d := range filtered {
 		paths[i] = d.Path
 	}
 	return C.CString(strings.Join(paths, "\n"))
