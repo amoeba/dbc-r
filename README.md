@@ -1,5 +1,7 @@
 # dbc
 
+R bindings to the [dbc](https://columnar.tech/dbc) CLI.
+Installs and makes [ADBC](https://arrow.apache.org/adbc) drivers available via [DBI](https://github.com/r-dbi/dbi)/[adbi](https://github.com/r-dbi/adbi) to packages like [dbplyr](https://dbplyr.tidyverse.org).
 
 ## Installation
 
@@ -12,7 +14,6 @@ remotes::install_github("amoeba/dbc-r")
 
 ```r
 library(dbc)
-library(DBI)
 library(dplyr)
 
 # Install the duckdb ADBC driver
@@ -53,8 +54,9 @@ con <- dbConnect(dbc::driver("snowflake"),
 con <- dbConnect(dbc::driver("duckdb"), uri = "my_data.duckdb")
 ```
 
-
 ### Search and manage drivers
+
+dbc is normally a CLI and this R packages bindgs dbc's CLI subcommands to R so you can control dbc with R code:
 
 ```r
 # Find available drivers
