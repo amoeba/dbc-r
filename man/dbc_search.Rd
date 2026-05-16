@@ -4,11 +4,14 @@
 \alias{dbc_search}
 \title{Search for available ADBC drivers}
 \usage{
-dbc_search(pattern = "")
+dbc_search(pattern = "", pre = FALSE)
 }
 \arguments{
 \item{pattern}{Character string to filter driver names. Default \code{""}
 returns all drivers.}
+
+\item{pre}{Logical. If \code{TRUE}, include pre-release drivers and
+versions (hidden by default). Default \code{FALSE}.}
 }
 \value{
 A character vector of driver names.

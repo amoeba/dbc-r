@@ -25,6 +25,25 @@ as standard DBI driver objects via [driver()].
   \item{[dbc_list()]}{List installed drivers}
   \item{[dbc_search()]}{Search the registry for available drivers}
   \item{[dbc_info()]}{Get registry metadata for a driver}
+  \item{[dbc_docs()]}{Get documentation URL for a driver}
+}
+}
+
+\section{Driver lists (project-level)}{
+
+\describe{
+  \item{[dbc_init()]}{Create a new dbc.toml driver list}
+  \item{[dbc_add()]}{Add a driver to the driver list}
+  \item{[dbc_remove()]}{Remove a driver from the driver list}
+  \item{[dbc_sync()]}{Install all drivers in the driver list}
+}
+}
+
+\section{Authentication}{
+
+\describe{
+  \item{[dbc_auth_login()]}{Authenticate with a private registry}
+  \item{[dbc_auth_logout()]}{Log out from a registry}
 }
 }
 

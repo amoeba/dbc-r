@@ -11,6 +11,7 @@ NeedsCompilation: yes
 Imports:
     adbi,
     adbcdrivermanager,
+    cli (>= 3.4.0),
     DBI,
     methods
 Suggests:
@@ -18,11 +19,17 @@ Suggests:
 Collate:
     'aaa-imports.R'
     'dbc-package.R'
+    'add.R'
+    'auth.R'
+    'docs.R'
     'driver.R'
     'info.R'
+    'init.R'
     'install.R'
     'list_drivers.R'
+    'remove.R'
     'search.R'
+    'sync.R'
     'uninstall.R'
 Config/testthat/edition: 3
 RoxygenNote: 7.3.3

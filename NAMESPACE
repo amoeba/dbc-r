@@ -1,7 +1,14 @@
+export(dbc_add)
+export(dbc_auth_login)
+export(dbc_auth_logout)
+export(dbc_docs)
 export(dbc_info)
+export(dbc_init)
 export(dbc_install)
 export(dbc_list)
+export(dbc_remove)
 export(dbc_search)
+export(dbc_sync)
 export(dbc_uninstall)
 export(driver)
 exportMethods(dbConnect)
@@ -10,6 +17,7 @@ exportClasses(DbcDriver)
 import(DBI)
 import(methods)
 importClassesFrom(adbi, AdbiDriver, AdbiConnection)
+importFrom(cli, cli_progress_bar)
 useDynLib(
   dbc,
   C_dbc_install = dbc_install_c,
@@ -17,5 +25,12 @@ useDynLib(
   C_dbc_uninstall = dbc_uninstall_c,
   C_dbc_list = dbc_list_c,
   C_dbc_info = dbc_info_c,
+  C_dbc_init = dbc_init_c,
+  C_dbc_add = dbc_add_c,
+  C_dbc_remove = dbc_remove_c,
+  C_dbc_sync = dbc_sync_c,
+  C_dbc_docs = dbc_docs_c,
+  C_dbc_auth_login = dbc_auth_login_c,
+  C_dbc_auth_logout = dbc_auth_logout_c,
   .registration = TRUE
 )

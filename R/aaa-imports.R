@@ -3,6 +3,7 @@
 #' @importClassesFrom adbi AdbiDriver AdbiConnection
 #' @importFrom adbi adbi
 #' @importFrom adbcdrivermanager adbc_driver
+#' @importFrom cli cli_progress_bar
 NULL
 
 # When load_all() sources this package, the namespace isn't initialised yet,

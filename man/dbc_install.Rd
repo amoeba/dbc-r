@@ -4,11 +4,21 @@
 \alias{dbc_install}
 \title{Install an ADBC driver}
 \usage{
-dbc_install(driver)
+dbc_install(driver, level = NULL, no_verify = FALSE, pre = FALSE)
 }
 \arguments{
 \item{driver}{Character string naming the driver to install (e.g.
-\code{"snowflake"}).}
+\code{"snowflake"}). May include a version constraint (e.g.
+\code{"mysql=0.1.0"} or \code{"mysql>=1,<2"}).}
+
+\item{level}{Config level to install to: \code{"user"} (default) or
+\code{"system"}.}
+
+\item{no_verify}{Logical. If \code{TRUE}, allow installation of drivers
+without a signature file. Default \code{FALSE}.}
+
+\item{pre}{Logical. If \code{TRUE}, allow installation of pre-release
+versions. Default \code{FALSE}.}
 }
 \value{
 Invisibly returns \code{NULL} on success; stops with an error
@@ -16,4 +26,5 @@ Invisibly returns \code{NULL} on success; stops with an error
 }
 \description{
 Equivalent to running \code{dbc install <driver>} on the command line.
+Displays a download progress bar powered by the \pkg{cli} package.
 }

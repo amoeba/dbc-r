@@ -4,10 +4,13 @@
 \alias{dbc_uninstall}
 \title{Uninstall an ADBC driver}
 \usage{
-dbc_uninstall(driver)
+dbc_uninstall(driver, level = NULL)
 }
 \arguments{
 \item{driver}{Character string naming the driver to uninstall.}
+
+\item{level}{Config level to uninstall from: \code{"user"} (default) or
+\code{"system"}.}
 }
 \value{
 Invisibly returns \code{NULL} on success; stops with an error on
